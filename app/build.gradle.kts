@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+//    alias(libs.plugins.kotlinx.serialization)
+    id("kotlinx-serialization")
 }
 
 android {
@@ -35,6 +37,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
     }
     buildFeatures {
         compose = true
@@ -55,7 +58,17 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.json) //JSON feature for serialisation
 
+    implementation(libs.napier)
+    implementation(libs.ktor.logging)
+    implementation(libs.ktor.client.contentnegotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
+    implementation(libs.ktor.client.okhttp)
+
+    implementation(libs.ktor.ktor.client.cio) // Engine for JVM
     implementation(platform(libs.androidx.compose.bom))
 
     implementation(libs.androidx.ui)
