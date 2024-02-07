@@ -1,6 +1,6 @@
 package com.groot.quotify.base
 
-import com.groot.quotify.core.QuoteEndPoint
+import com.groot.quotify.core.QuoteEndPoint.QUOTE_OF_THE_DAY
 import com.groot.quotify.dto.QotdResponse
 import com.groot.quotify.initLogger
 import io.github.aakira.napier.Napier
@@ -18,10 +18,8 @@ import kotlinx.serialization.json.Json
 
 class QuoteApiModel {
 
-
-    suspend fun getQuoteOfTheDay(): QotdResponse {
-
-        val httpClient = HttpClient() {
+    private fun httpClient(): HttpClient {
+        return HttpClient() {
             install(Logging) {
                 level = LogLevel.HEADERS
                 logger = object : Logger {
@@ -31,26 +29,25 @@ class QuoteApiModel {
                 }
             }
             install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                })
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        useAlternativeNames = false
+                    })
             }
         }.also { initLogger() }
+    }
 
-        //https://favqs.com/api/qotd
-        val url = QuoteEndPoint.BASE_QUOTE + QuoteEndPoint.API + QuoteEndPoint.QUOTE_OF_DAY
-        println(url)
 
-        val apiResponse = httpClient.get(url) {
+    //https://favqs.com/api/qotd
+    suspend fun getQuoteOfTheDay(): QotdResponse {
+        val httpClient = httpClient()
+        val apiResponse = httpClient.get(QUOTE_OF_THE_DAY) {
             headers {
                 append(HttpHeaders.ContentType, "application/json")
             }
         }
-
         val quoteDto: QotdResponse = apiResponse.body()
-
-        println(quoteDto.quote?.body)
-
         return quoteDto
     }
 
