@@ -6,4 +6,5 @@ object Route {
     val signUpScreen = "signUpScreen"
     val loginScreen = "loginScreen"
     val homeScreen = "homeScreen"
+    val savedQuoteListScreen = "savedQuoteListScreen"
 }

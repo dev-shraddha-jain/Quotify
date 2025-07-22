@@ -1,59 +1,62 @@
 package com.groot.quotify.ui.theme
 
+
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
+// Define your color schemes
 private val DarkColorScheme = darkColorScheme(
     primary = jetBlack,
-    secondary = jetBlack,
-    tertiary = Color.White
+    secondary = platinum,
+    tertiary = jetBlack,
+    background = /* Your dark background */ jetBlack,
+    onBackground = /* Your text color on dark background */ platinum,
+    onSurface = /* Your text color on dark surface */ platinum,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color.White,
-    secondary = Color.White,
-    tertiary = jetBlack
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = platinum,
+    secondary = jetBlack,
+    tertiary = Pink40,
+    background = /* Your light background */ platinum,
+    onBackground = /* Your text color on light background */ Black,
+    onSurface = /* Your text color on light surface */ Black,
 )
 
 @Composable
 fun QuotifyTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
+    isDarkTheme: MutableState<Boolean>
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colorScheme = if (isDarkTheme.value) {
+        DarkColorScheme
+    } else {
+        LightColorScheme
+    }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb() // Or your desired status bar color
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkTheme.value
+        }
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = Typography, // Assuming you have Typography defined
         content = content
     )
 }
